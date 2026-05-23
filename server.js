@@ -355,3 +355,110 @@ app.post('/api/claude/analyze-photo', auth, async (req, res) => {
         max_tokens: 2000,
         messages: [
           {
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: {
+                  type: 'base64',
+                  media_type: 'image/jpeg',
+                  data: imageData.split(',')[1]
+                }
+              },
+              {
+                type: 'text',
+                text: `Eres experto carpintero. Analiza esta foto profesionalmente:
+1. Mueble: Tipo y descripción
+2. Dimensiones: Alto × Ancho × Profundo (cm)
+3. Materiales: Recomendados con precios
+4. Costo estimado: Total de materiales
+5. Pasos construcción: 4-5 pasos claros
+6. Dificultad: Principiante/Intermedio/Avanzado
+7. Tiempo: Horas de construcción
+8. Precio venta sugerido: Mercado competitivo
+Sé muy específico y profesional.`
+              }
+            ]
+          }
+        ]
+      },
+      {
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        }
+      }
+    );
+    
+    res.json({
+      analysis: response.data.content[0].text,
+      usosRestantes: user.plan === 'premium' ? '∞' : (30 - user.usosHoy)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/claude/chat', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    
+    const hoy = new Date();
+    const ultimoReset = new Date(user.ultimoResetUsos);
+    if (hoy.getDate() !== ultimoReset.getDate()) {
+      user.usosHoy = 0;
+      user.ultimoResetUsos = hoy;
+      await user.save();
+    }
+    
+    if (user.plan === 'free' && user.usosHoy >= 30) {
+      return res.status(400).json({ error: 'Límite de usos diario alcanzado. Actualiza a Premium.' });
+    }
+    
+    if (user.plan === 'free') {
+      user.usosHoy += 1;
+      await user.save();
+    }
+    
+    const { message } = req.body;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    
+    const response = await axios.post(
+      'https://api.anthropic.com/v1/messages',
+      {
+        model: 'claude-opus-4-1-20250805',
+        max_tokens: 2000,
+        messages: [
+          {
+            role: 'user',
+            content: `Eres experto carpintero con 20+ años. Hablas español fluidamente.
+Pregunta: "${message}"
+Responde de forma profesional, directo y útil. Números específicos cuando sea posible.`
+          }
+        ]
+      },
+      {
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        }
+      }
+    );
+    
+    res.json({
+      response: response.data.content[0].text,
+      usosRestantes: user.plan === 'premium' ? '∞' : (30 - user.usosHoy)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// SERVIDOR
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Servidor ejecutándose en puerto ${PORT}`);
+});
+
+module.exports = app;
