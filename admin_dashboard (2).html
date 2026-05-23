@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarpiteriAPP Admin - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        :root {
+            --primary: #0D47A1;
+            --secondary: #FF8C00;
+            --dark: #0A0E27;
+            --darker: #050810;
+            --card: #141B33;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0AEC0;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ==================== SIDEBAR ==================== */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, var(--card) 0%, #0F1829 100%);
+            border-right: 1px solid #2D3A52;
+            padding: 2rem 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #2D3A52;
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-logo h2 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .menu-item {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--secondary);
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, rgba(13, 71, 161, 0.2), rgba(255, 140, 0, 0.2));
+            color: var(--secondary);
+            border-left: 3px solid var(--secondary);
+            padding-left: calc(1rem - 3px);
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid #2D3A52;
+            padding-top: 1rem;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(239, 68, 68, 0.2);
+            color: #FECACA;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(13, 71, 161, 0.1), transparent);
+            border-bottom: 1px solid #2D3A52;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* ==================== CONTENT AREA ==================== */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ==================== CARDS ==================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--card) 0%, #1F2A47 100%);
+            border: 1px solid #2D3A52;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            color: var(--success);
+        }
+
+        /* ==================== TABLE ==================== */
+        .table-container {
+            background: linear-gradient(135deg, var(--card) 0%, #1F2A47 100%);
+            border: 1px solid #2D3A52;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid #2D3A52;
+        }
+
+        th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #2D3A52;
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: rgba(255, 140, 0, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #A7F3D0;
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #FECACA;
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #FCD34D;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-view {
+            background: rgba(13, 71, 161, 0.2);
+            color: #BFDBFE;
+        }
+
+        .btn-view:hover {
+            background: rgba(13, 71, 161, 0.3);
+        }
+
+        .btn-suspend {
+            background: rgba(239, 68, 68, 0.2);
+            color: #FECACA;
+        }
+
+        .btn-suspend:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* ==================== CHARTS ==================== */
+        .chart-container {
+            background: linear-gradient(135deg, var(--card) 0%, #1F2A47 100%);
+            border: 1px solid #2D3A52;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ==================== ALERTS ==================== */
+        .alerts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .alert-item {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #F59E0B;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .alert-item i {
+            color: #F59E0B;
+            margin-top: 0.25rem;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-titulo {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-fecha {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ==================== MODALS ==================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border: 1px solid #2D3A52;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            clear: both;
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn-primary {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(13, 71, 161, 0.3);
+        }
+
+        /* ==================== LOADING ==================== */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .loading span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--secondary);
+            animation: pulse 1.5s infinite;
+        }
+
+        .loading span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* ==================== LOGIN ==================== */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--dark) 0%, var(--darker) 100%);
+        }
+
+        .login-box {
+            background: linear-gradient(135deg, var(--card) 0%, #1F2A47 100%);
+            border: 1px solid #2D3A52;
+            border-radius: 12px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .form-input {
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid #2D3A52;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.2);
+        }
+
+        .error-message {
+            padding: 0.75rem;
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 3px solid #EF4444;
+            border-radius: 6px;
+            color: #FECACA;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="login-logo">🔨</div>
+                <h1>CarpiteriAPP Admin</h1>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Panel de Control</p>
+            </div>
+
+            <div class="error-message" id="loginError"></div>
+
+            <div class="login-form">
+                <div class="form-group">
+                    <label class="form-label">Usuario</label>
+                    <input type="text" id="loginUser" class="form-input" placeholder="carpinteriAPP">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" id="loginPass" class="form-input" placeholder="••••••••">
+                </div>
+                <button class="btn-primary" onclick="handleAdminLogin()">Acceder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="adminPanel" class="container" style="display: none;">
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">🔨</div>
+                <div>
+                    <h2>Admin</h2>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">CarpiteriAPP</div>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-item active" onclick="switchPage('dashboard')">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </div>
+                <div class="menu-item" onclick="switchPage('clientes')">
+                    <i class="fas fa-users"></i> Clientes
+                </div>
+                <div class="menu-item" onclick="switchPage('analytics')">
+                    <i class="fas fa-bar-chart"></i> Analytics
+                </div>
+                <div class="menu-item" onclick="switchPage('alertas')">
+                    <i class="fas fa-exclamation-circle"></i> Alertas
+                </div>
+                <div class="menu-item" onclick="switchPage('reportes')">
+                    <i class="fas fa-file-export"></i> Reportes
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="header-user">
+                    <span id="adminEmail"></span>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- DASHBOARD PAGE -->
+                <div id="dashboard" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                <i class="fas fa-users"></i> Total Clientes
+                            </div>
+                            <div class="stat-value" id="totalClientes">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                <i class="fas fa-check-circle"></i> Activos
+                            </div>
+                            <div class="stat-value" id="clientesActivos">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                <i class="fas fa-ban"></i> Suspendidos
+                            </div>
+                            <div class="stat-value" id="clientesSuspendidos">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                <i class="fas fa-dollar-sign"></i> Ingresos
+                            </div>
+                            <div class="stat-value" id="ingresosTotales">$0</div>
+                            <div class="stat-change" id="tuComision">Tu: $0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                <i class="fas fa-lightning-bolt"></i> Usos Hoy
+                            </div>
+                            <div class="stat-value" id="totalUsosHoy">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                <i class="fas fa-chart-pie"></i> Promedio/día
+                            </div>
+                            <div class="stat-value" id="usosPromedio">0</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3 class="chart-title">⚠️ Alertas Recientes</h3>
+                        <div id="alertasRecientes" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+
+                <!-- CLIENTES PAGE -->
+                <div id="clientes" class="page">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+                        <h2>Gestión de Clientes</h2>
+                        <div>
+                            <select id="filtroEstado" onchange="cargarClientes()" style="padding: 0.5rem; background: var(--card); color: var(--text-primary); border: 1px solid #2D3A52; border-radius: 6px;">
+                                <option value="todos">Todos</option>
+                                <option value="activa">Activos</option>
+                                <option value="suspendida">Suspendidos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="clientesTable">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Nombre</th>
+                                    <th>Estado</th>
+                                    <th>Usos/Mes</th>
+                                    <th>Días Activo</th>
+                                    <th>Último Acceso</th>
+                                    <th>IPs</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientesList">
+                                <tr><td colspan="8" style="text-align: center; color: var(--text-secondary);">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS PAGE -->
+                <div id="analytics" class="page">
+                    <h2>Analytics</h2>
+                    <div style="margin-top: 2rem;">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Preguntas Más Frecuentes</h3>
+                            <div id="preguntasChart" style="color: var(--text-secondary);">
+                                <div class="loading">
+                                    <span></span><span></span><span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3 class="chart-title">Horarios de Mayor Uso</h3>
+                            <div id="horariosChart" style="color: var(--text-secondary);">
+                                <div class="loading">
+                                    <span></span><span></span><span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALERTAS PAGE -->
+                <div id="alertas" class="page">
+                    <h2>Sistema de Alertas</h2>
+                    <div id="alertasContainer" style="margin-top: 2rem;">
+                        <div class="loading">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REPORTES PAGE -->
+                <div id="reportes" class="page">
+                    <h2>Exportar Reportes</h2>
+                    <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <button class="btn-primary" onclick="exportarClientesCSV()" style="padding: 1rem;">
+                            <i class="fas fa-download"></i> Clientes (CSV)
+                        </button>
+                        <button class="btn-primary" onclick="exportarAnalyticsCSV()" style="padding: 1rem;">
+                            <i class="fas fa-download"></i> Analytics (CSV)
+                        </button>
+                        <button class="btn-primary" onclick="exportarReporteCompleto()" style="padding: 1rem;">
+                            <i class="fas fa-download"></i> Reporte Completo (PDF)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE CLIENTE -->
+    <div id="modalCliente" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="cerrarModal()">&times;</span>
+            <h2 class="modal-title">Detalle del Cliente</h2>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://carpiteriapp-backend.vercel.app';
+        let token = localStorage.getItem('adminToken');
+        let adminEmail = localStorage.getItem('adminEmail');
+
+        if (token) {
+            mostrarDashboard();
+            cargarDashboard();
+            cargarClientes();
+            cargarAnalytics();
+        }
+
+        async function handleAdminLogin() {
+            const user = document.getElementById('loginUser').value;
+            const pass = document.getElementById('loginPass').value;
+
+            if (!user || !pass) {
+                mostrarError('loginError', 'Completa usuario y contraseña');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user, password: pass })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    mostrarError('loginError', data.error);
+                    return;
+                }
+
+                token = data.token;
+                adminEmail = data.admin.email;
+                localStorage.setItem('adminToken', token);
+                localStorage.setItem('adminEmail', adminEmail);
+
+                mostrarDashboard();
+                cargarDashboard();
+                cargarClientes();
+                cargarAnalytics();
+            } catch (error) {
+                mostrarError('loginError', 'Error de conexión');
+            }
+        }
+
+        function mostrarError(elementId, mensaje) {
+            const el = document.getElementById(elementId);
+            el.textContent = mensaje;
+            el.classList.add('show');
+        }
+
+        function mostrarDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'flex';
+            document.getElementById('adminEmail').textContent = adminEmail;
+        }
+
+        function switchPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageName).classList.add('active');
+
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            event.target.closest('.menu-item').classList.add('active');
+
+            const titles = {
+                dashboard: 'Dashboard',
+                clientes: 'Gestión de Clientes',
+                analytics: 'Analytics',
+                alertas: 'Alertas',
+                reportes: 'Reportes'
+            };
+            document.getElementById('pageTitle').textContent = titles[pageName];
+        }
+
+        async function cargarDashboard() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                const resumen = data.resumenGeneral;
+
+                document.getElementById('totalClientes').textContent = resumen.totalClientes;
+                document.getElementById('clientesActivos').textContent = resumen.clientesActivos;
+                document.getElementById('clientesSuspendidos').textContent = resumen.clientesSuspendidos;
+                document.getElementById('ingresosTotales').textContent = `$${(resumen.ingresosTotales / 1000000).toFixed(1)}M`;
+                document.getElementById('tuComision').textContent = `Tu: $${(resumen.tuComision / 1000000).toFixed(1)}M`;
+                document.getElementById('totalUsosHoy').textContent = data.uso.totalUsosHoy;
+                document.getElementById('usosPromedio').textContent = data.uso.usosPromedioDiario;
+
+                // Alertas
+                const alertasHTML = data.alertas.length > 0
+                    ? data.alertas.map(a => `
+                        <div class="alert-item">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="alert-content">
+                                <div class="alert-titulo">${a._id.email}: ${a.alertas.tipo}</div>
+                                <div>${a.alertas.mensaje}</div>
+                                <div class="alert-fecha">${new Date(a.alertas.fecha).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    `).join('')
+                    : '<div style="text-align: center; color: var(--text-secondary);">Sin alertas</div>';
+
+                document.getElementById('alertasRecientes').innerHTML = alertasHTML;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function cargarClientes() {
+            try {
+                const estado = document.getElementById('filtroEstado')?.value || 'todos';
+                const response = await fetch(`${API_URL}/api/admin/clientes?estado=${estado}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                const html = data.clientes.map(c => `
+                    <tr>
+                        <td>${c.email}</td>
+                        <td>${c.nombre}</td>
+                        <td><span class="badge badge-${c.estado === 'activa' ? 'success' : 'danger'}">${c.estado}</span></td>
+                        <td>${c.usosEsteMes}</td>
+                        <td>${c.diasActivo}</td>
+                        <td>${c.ultimoAcceso ? new Date(c.ultimoAcceso).toLocaleDateString() : 'Nunca'}</td>
+                        <td>${c.ipsUsadas}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" onclick="verDetalleCliente('${c.id}')">Ver</button>
+                                ${c.estado === 'activa' 
+                                    ? `<button class="btn-action btn-suspend" onclick="suspenderCliente('${c.id}')">Suspender</button>`
+                                    : `<button class="btn-action btn-view" onclick="reactivarCliente('${c.id}')">Reactivar</button>`
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('clientesList').innerHTML = html || '<tr><td colspan="8" style="text-align: center;">Sin clientes</td></tr>';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function cargarAnalytics() {
+            try {
+                // Preguntas frecuentes
+                const preguntasRes = await fetch(`${API_URL}/api/admin/analytics/preguntas-frecuentes`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const preguntas = await preguntasRes.json();
+
+                const preguntasHTML = preguntas.slice(0, 10).map((p, i) => `
+                    <div style="padding: 0.75rem 0; border-bottom: 1px solid #2D3A52; display: flex; justify-content: space-between;">
+                        <span>${i + 1}. ${p._id.substring(0, 50)}...</span>
+                        <span style="color: var(--secondary); font-weight: 600;">${p.total} veces</span>
+                    </div>
+                `).join('');
+
+                document.getElementById('preguntasChart').innerHTML = preguntasHTML || '<div style="text-align: center;">Sin datos</div>';
+
+                // Horarios
+                const horariosRes = await fetch(`${API_URL}/api/admin/analytics/horarios`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const horarios = await horariosRes.json();
+
+                const horariosHTML = horarios.map(h => `
+                    <div style="padding: 0.75rem 0; border-bottom: 1px solid #2D3A52; display: flex; justify-content: space-between;">
+                        <span>${h._id}:00hs</span>
+                        <div style="width: ${(h.total / Math.max(...horarios.map(x => x.total))) * 200}px; height: 20px; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 4px;"></div>
+                        <span style="color: var(--secondary); font-weight: 600;">${h.total}</span>
+                    </div>
+                `).join('');
+
+                document.getElementById('horariosChart').innerHTML = horariosHTML || '<div style="text-align: center;">Sin datos</div>';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function verDetalleCliente(id) {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/cliente/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                const c = data.cliente;
+
+                const html = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div><strong>Email:</strong> ${c.email}</div>
+                        <div><strong>Nombre:</strong> ${c.nombre}</div>
+                        <div><strong>Estado:</strong> <span class="badge badge-${c.estado === 'activa' ? 'success' : 'danger'}">${c.estado}</span></div>
+                        <div><strong>Plan:</strong> ${c.plan}</div>
+                        <div><strong>Usos Totales:</strong> ${c.totalUsosHistorico}</div>
+                        <div><strong>Usos Este Mes:</strong> ${c.usosEsteMes}</div>
+                        <div><strong>Días Activo:</strong> ${c.diasActivo}</div>
+                        <div><strong>Última Actividad:</strong> ${new Date(c.ultimoAcceso).toLocaleString()}</div>
+                        <div><strong>IPs Usadas:</strong> ${c.ipsUsadas.map(i => i.ip).join(', ')}</div>
+                        
+                        <hr style="border: none; border-top: 1px solid #2D3A52; margin: 1rem 0;">
+                        
+                        <h3>Alertas (${c.alertas.length})</h3>
+                        ${c.alertas.length > 0 
+                            ? c.alertas.map(a => `<div class="alert-item"><i class="fas fa-warning"></i> ${a.tipo}: ${a.mensaje}</div>`).join('')
+                            : '<div style="color: var(--text-secondary);">Sin alertas</div>'
+                        }
+                        
+                        <hr style="border: none; border-top: 1px solid #2D3A52; margin: 1rem 0;">
+                        
+                        <h3>Actividad Reciente</h3>
+                        ${data.actividad.length > 0
+                            ? data.actividad.slice(0, 5).map(a => `
+                                <div style="padding: 0.75rem; background: rgba(255,140,0,0.05); border-radius: 6px; margin-bottom: 0.5rem;">
+                                    <div><strong>${a.pregunta.substring(0, 60)}...</strong></div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${new Date(a.horario).toLocaleString()} | ${a.dispositivo}</div>
+                                </div>
+                            `).join('')
+                            : '<div style="color: var(--text-secondary);">Sin actividad</div>'
+                        }
+                    </div>
+                `;
+
+                document.getElementById('modalBody').innerHTML = html;
+                document.getElementById('modalCliente').classList.add('active');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function suspenderCliente(id) {
+            if (!confirm('¿Suspender este cliente?')) return;
+
+            try {
+                await fetch(`${API_URL}/api/admin/cliente/${id}/suspender`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                cargarClientes();
+                cargarDashboard();
+                alert('Cliente suspendido');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function reactivarCliente(id) {
+            if (!confirm('¿Reactivar este cliente?')) return;
+
+            try {
+                await fetch(`${API_URL}/api/admin/cliente/${id}/reactivar`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                cargarClientes();
+                cargarDashboard();
+                alert('Cliente reactivado');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalCliente').classList.remove('active');
+        }
+
+        function exportarClientesCSV() {
+            alert('Descargando CSV de clientes...');
+            // Implementar descarga CSV
+        }
+
+        function exportarAnalyticsCSV() {
+            alert('Descargando CSV de analytics...');
+            // Implementar descarga CSV
+        }
+
+        function exportarReporteCompleto() {
+            alert('Generando PDF...');
+            // Implementar generación PDF
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminEmail');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
